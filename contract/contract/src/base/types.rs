@@ -94,6 +94,12 @@ pub struct CampaignMetrics {
     pub last_donation_at: u64,
 }
 
+impl Default for CampaignMetrics {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CampaignMetrics {
     pub fn new() -> Self {
         Self {
@@ -110,6 +116,12 @@ pub struct PoolMetrics {
     pub total_raised: i128,
     pub contributor_count: u32,
     pub last_donation_at: u64,
+}
+
+impl Default for PoolMetrics {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl PoolMetrics {
@@ -173,6 +185,8 @@ pub enum StorageKey {
     PoolMetadata(u64),
     NextDisbursementId(u64),
     EmergencyWithdrawal,
+    CrowdfundingToken,
+    CreationFee,
 }
 
 #[cfg(test)]

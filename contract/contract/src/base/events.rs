@@ -79,6 +79,21 @@ pub fn emergency_withdraw_executed(env: &Env, admin: Address, token: Address, am
     env.events().publish(topics, (token, amount));
 }
 
+pub fn crowdfunding_token_set(env: &Env, admin: Address, token: Address) {
+    let topics = (Symbol::new(env, "crowdfunding_token_set"), admin);
+    env.events().publish(topics, token);
+}
+
+pub fn creation_fee_set(env: &Env, admin: Address, fee: i128) {
+    let topics = (Symbol::new(env, "creation_fee_set"), admin);
+    env.events().publish(topics, fee);
+}
+
+pub fn creation_fee_paid(env: &Env, creator: Address, amount: i128) {
+    let topics = (Symbol::new(env, "creation_fee_paid"), creator);
+    env.events().publish(topics, amount);
+}
+
 pub fn refund(
     env: &Env,
     pool_id: u64,
