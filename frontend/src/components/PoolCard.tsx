@@ -1,5 +1,6 @@
 import React from "react";
 import { TrendingUp, Users } from "lucide-react";
+import Image from "next/image";
 
 export interface PoolCardProps {
   id: string;
@@ -27,7 +28,7 @@ export const PoolCard: React.FC<PoolCardProps> = ({
     <div className="group bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer flex flex-col h-full">
       {/* Image Container with Hover Scale Result */}
       <div className="relative h-48 w-full overflow-hidden">
-        <img
+        <Image
           src={imageUrl}
           alt={title}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
