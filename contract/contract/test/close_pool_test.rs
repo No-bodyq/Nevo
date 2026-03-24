@@ -159,7 +159,7 @@ fn test_close_pool_completed_state() {
 #[test]
 fn test_close_pool_nonexistent() {
     let env = Env::default();
-    let (client, admin, token_address) = setup_test(&env);
+    let (client, admin, _token_address) = setup_test(&env);
 
     let nonexistent_pool_id = 999u64;
 
