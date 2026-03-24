@@ -256,6 +256,87 @@ impl CrowdfundingTrait for CrowdfundingContract {
             .unwrap_or(0))
     }
 
+    fn buy_ticket(
+        env: Env,
+        pool_id: u64,
+        buyer: Address,
+        asset: Address,
+        price: i128,
+    ) -> Result<(i128, i128), CrowdfundingError> {
+        // Ensure contract is initialised
+        if !env.storage().instance().has(&StorageKey::Admin) {
+            return Err(CrowdfundingError::NotInitialized);
+        }
+
+        // Validate price
+        if price <= 0 {
+            return Err(CrowdfundingError::InvalidAmount);
+        }
+
+        // Pool must exist
+        let pool_key = StorageKey::Pool(pool_id);
+        if !env.storage().instance().has(&pool_key) {
+            return Err(CrowdfundingError::PoolNotFound);
+        }
+
+        // Pool must be Active
+        let state_key = StorageKey::PoolState(pool_id);
+        let state: PoolState = env
+            .storage()
+            .instance()
+            .get(&state_key)
+            .unwrap_or(PoolState::Active);
+        if state != PoolState::Active {
+            return Err(CrowdfundingError::InvalidPoolState);
+        }
+
+        // Verify asset matches the contract token
+        let token_key = StorageKey::CrowdfundingToken;
+        let contract_token: Address = env
+            .storage()
+            .instance()
+            .get(&token_key)
+            .ok_or(CrowdfundingError::NotInitialized)?;
+        if asset != contract_token {
+            return Err(CrowdfundingError::InvalidToken);
+        }
+
+        buyer.require_auth();
+
+        // ── fee split ────────────────────────────────────────────────────────
+        let fee_bps: u32 = env
+            .storage()
+            .instance()
+            .get(&StorageKey::PlatformFeeBps)
+            .unwrap_or(0);
+
+        let fee_amount = Self::calculate_platform_fee(price, fee_bps);
+        let event_amount = price - fee_amount;
+
+        // Transfer full price from buyer to contract
+        use soroban_sdk::token;
+        let token_client = token::Client::new(&env, &asset);
+        token_client.transfer(&buyer, &env.current_contract_address(), &price);
+
+        // Credit event pool
+        let event_pool_key = StorageKey::EventPool(pool_id);
+        let current_event: i128 = env.storage().instance().get(&event_pool_key).unwrap_or(0);
+        env.storage()
+            .instance()
+            .set(&event_pool_key, &(current_event + event_amount));
+
+        // Credit platform fee pool
+        let event_fee_key = StorageKey::EventPlatformFees(pool_id);
+        let current_fees: i128 = env.storage().instance().get(&event_fee_key).unwrap_or(0);
+        env.storage()
+            .instance()
+            .set(&event_fee_key, &(current_fees + fee_amount));
+
+        events::ticket_sold(&env, pool_id, buyer, price, event_amount, fee_amount);
+
+        Ok((event_amount, fee_amount))
+    }
+
     fn get_global_raised_total(env: Env) -> i128 {
         env.storage()
             .instance()

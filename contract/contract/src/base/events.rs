@@ -163,3 +163,16 @@ pub fn platform_fee_bps_set(env: &Env, admin: Address, fee_bps: u32) {
     let topics = (Symbol::new(env, "platform_fee_bps_set"), admin);
     env.events().publish(topics, fee_bps);
 }
+
+pub fn ticket_sold(
+    env: &Env,
+    pool_id: u64,
+    buyer: Address,
+    price: i128,
+    event_amount: i128,
+    fee_amount: i128,
+) {
+    let topics = (Symbol::new(env, "ticket_sold"), pool_id, buyer);
+    env.events()
+        .publish(topics, (price, event_amount, fee_amount));
+}
