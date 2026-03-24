@@ -25,7 +25,12 @@ fn setup_test(env: &Env) -> (CrowdfundingContractClient, Address, Address) {
     (client, admin, token_address)
 }
 
-fn create_test_pool(client: &CrowdfundingContractClient, env: &Env, creator: &Address, token_address: &Address) -> u64 {
+fn create_test_pool(
+    client: &CrowdfundingContractClient,
+    env: &Env,
+    creator: &Address,
+    token_address: &Address,
+) -> u64 {
     let config = PoolConfig {
         name: String::from_str(env, "Test Pool"),
         description: String::from_str(env, "A test pool for closing"),
