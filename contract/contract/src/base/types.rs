@@ -264,6 +264,7 @@ pub enum StorageKey {
     EmergencyWithdrawal,
     CrowdfundingToken,
     CreationFee,
+    PlatformFeeBps,
     VerifiedCause(Address),
     PlatformFees,
     GlobalTotalRaised,
@@ -277,6 +278,11 @@ pub enum StorageKey {
     EmergencyWithdrawalLock,
     PoolCreator(u64),
     EventFeeTreasury,
+    PlatformFeeBps,
+    // Per-pool revenue split: tokens destined for the event creator
+    EventPool(u64),
+    // Per-pool revenue split: tokens accumulated as platform fee
+    EventPlatformFees(u64),
 }
 
 #[cfg(test)]
