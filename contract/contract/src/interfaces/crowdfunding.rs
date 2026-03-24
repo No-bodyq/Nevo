@@ -172,11 +172,8 @@ pub trait CrowdfundingTrait {
 
     fn is_cause_verified(env: Env, cause: Address) -> bool;
 
-    fn withdraw_platform_fees(
-        env: Env,
-        admin: Address,
-        amount: i128,
-    ) -> Result<(), CrowdfundingError>;
+    fn withdraw_platform_fees(env: Env, to: Address, amount: i128)
+        -> Result<(), CrowdfundingError>;
 
     fn set_emergency_contact(env: Env, contact: Address) -> Result<(), CrowdfundingError>;
 
@@ -192,4 +189,23 @@ pub trait CrowdfundingTrait {
     ) -> Result<Vec<PoolContribution>, CrowdfundingError>;
 
     fn get_pool_remaining_time(env: Env, pool_id: u64) -> Result<u64, CrowdfundingError>;
+
+    fn set_platform_fee_bps(env: Env, fee_bps: u32) -> Result<(), CrowdfundingError>;
+
+    fn get_platform_fee_bps(env: Env) -> Result<u32, CrowdfundingError>;
+
+    /// Purchase a ticket for a pool, splitting the payment between the event
+    /// pool and the platform fee pool using the current `PlatformFeeBps`.
+    ///
+    /// * `pool_id`  – target pool (must exist and be Active)
+    /// * `buyer`    – address paying for the ticket (requires auth)
+    /// * `asset`    – token used for payment
+    /// * `price`    – total ticket price (must be > 0)
+    fn buy_ticket(
+        env: Env,
+        pool_id: u64,
+        buyer: Address,
+        asset: Address,
+        price: i128,
+    ) -> Result<(i128, i128), CrowdfundingError>;
 }
